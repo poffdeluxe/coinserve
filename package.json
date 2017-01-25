@@ -1,0 +1,19 @@
+{
+  "name": "coinserve",
+  "version": "1.0.0",
+  "description": "A simple service to fake a bitcoin api for testing purposes",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "coinserve": "index.js"
+  },
+  "author": "Poff Poffenberger",
+  "license": "MIT",
+  "dependencies": {
+    "bitcore-lib": "^0.13.19",
+    "eccrypto": "^1.0.3",
+    "express": "^4.14.0"
+  }
+}
