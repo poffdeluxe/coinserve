@@ -87,10 +87,14 @@ app.post('/tx/create', (req, res) => {
 });
 
 app.post('/tx/sign', (req, res) => {
+  // Expects tx we're verifying
+  // Public in key format
+  // and signature of transaction (in hex format)
+
   const tx = req.body.tx;
-  const publicKey = req.body.publicKey;
+  const publicKey = Buffer.from(req.body.publicKey, 'hex');
   const toSign = crypto.createHash('sha256').update(JSON.stringify(tx)).digest();
-  const sig = req.body.sig;
+  const sig = Buffer.from(req.body.sig, 'hex');
 
   eccrypto.verify(publicKey, toSign, sig).then(function() {
     wallets[walletByAddress[tx.from]] -= tx.amount;
@@ -98,9 +102,9 @@ app.post('/tx/sign', (req, res) => {
 
     console.log(`Transfering ${tx.amount} from ${tx.from} to ${tx.to}`);
 
-    // TODO: have a job that hits a webhook
-
     res.json({nice: 'good job'});
+
+
   }).catch(function() {
     res.status(400).json({errors: ['Failed to verify signature']});
   });
