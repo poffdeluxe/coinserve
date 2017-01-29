@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const cp = require('child_process');
 const bitcore = require('bitcore-lib');
 const eccrypto = require('eccrypto');
 const crypto = require('crypto');
@@ -21,15 +22,24 @@ const buildByAddrLookup = () => {
   });
 };
 
-// Look for an initial file to seed from
-if(process.argv.length > 2) {
-  const filename = process.argv[2];
+// Load-up our args (looking for a seed filename or a webhook url)
+const argOpts = {
+  alias: {
+    hook: 'h',
+    seedFilename: 's'
+  }
+};
+const argv = require('minimist')(process.argv.slice(2), argOpts);
 
-  const seedWallets = require(filename);
+const seedFilename = argv.seedFilename;
+if(seedFilename) {
+  const seedWallets = require(seedFilename);
 
   // Copy in the seed wallets.
   wallets = Object.assign({}, seedWallets);
 }
+
+const hookUrl = argv.hook;
 
 // If we didn't just load wallets from a file, load up some seed wallets
 if(!wallets) {
@@ -102,9 +112,18 @@ app.post('/tx/sign', (req, res) => {
 
     console.log(`Transfering ${tx.amount} from ${tx.from} to ${tx.to}`);
 
+    // Send the response
     res.json({nice: 'good job'});
 
+    // Call the webhook if one is defined
+    if(hookUrl) {
+      const child = cp.fork('./hook');
 
+      child.send({
+        tx,
+        hookUrl
+      });
+    }
   }).catch(function() {
     res.status(400).json({errors: ['Failed to verify signature']});
   });
@@ -121,4 +140,8 @@ app.listen(3001, function () {
 
     console.log(`${privateKey.toWIF()} (${addr}): ${balance}`);
   });
+
+  if(hookUrl) {
+    console.log(`Webhook set to hit ${hookUrl}`);
+  }
 });
