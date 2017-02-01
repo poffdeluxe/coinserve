@@ -1,7 +1,7 @@
 {
   "name": "coinserve",
   "version": "1.0.0",
-  "description": "A simple service to fake a bitcoin api for testing purposes",
+  "description": "A simple service to fake a bitcoin/cryptocurrency api for testing purposes",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

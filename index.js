@@ -33,7 +33,7 @@ const argv = require('minimist')(process.argv.slice(2), argOpts);
 
 const seedFilename = argv.seedFilename;
 if(seedFilename) {
-  const seedWallets = require(seedFilename);
+  const seedWallets = require(__dirname + '/' + seedFilename);
 
   // Copy in the seed wallets.
   wallets = Object.assign({}, seedWallets);
@@ -90,7 +90,8 @@ app.post('/tx/create', (req, res) => {
     return res.sendStatus(400);
   }
 
-  const tx = { to, from, amount };
+  var hash = crypto.randomBytes(20).toString('hex');
+  const tx = { to, from, amount, hash };
   const toSign = crypto.createHash('sha256').update(JSON.stringify(tx)).digest().toString('hex');
 
   return res.json({tx, toSign});
@@ -113,7 +114,7 @@ app.post('/tx/sign', (req, res) => {
     console.log(`Transfering ${tx.amount} from ${tx.from} to ${tx.to}`);
 
     // Send the response
-    res.json({nice: 'good job'});
+    res.json(tx);
 
     // Call the webhook if one is defined
     if(hookUrl) {
