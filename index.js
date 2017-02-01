@@ -33,7 +33,7 @@ const argv = require('minimist')(process.argv.slice(2), argOpts);
 
 const seedFilename = argv.seedFilename;
 if(seedFilename) {
-  const seedWallets = require(__dirname + '/' + seedFilename);
+  const seedWallets = require(seedFilename);
 
   // Copy in the seed wallets.
   wallets = Object.assign({}, seedWallets);
@@ -118,7 +118,7 @@ app.post('/tx/sign', (req, res) => {
 
     // Call the webhook if one is defined
     if(hookUrl) {
-      const child = cp.fork('./hook');
+      const child = cp.fork(__dirname + '/' + '/hook');
 
       child.send({
         tx,
