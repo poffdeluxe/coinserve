@@ -94,6 +94,8 @@ app.post('/tx/create', (req, res) => {
   const tx = { to, from, amount, hash };
   const toSign = crypto.createHash('sha256').update(JSON.stringify(tx)).digest().toString('hex');
 
+  console.log(`Value to sign for ${hash}: ${toSign}`);
+
   return res.json({tx, toSign});
 });
 
@@ -106,6 +108,10 @@ app.post('/tx/sign', (req, res) => {
   const publicKey = Buffer.from(req.body.publicKey, 'hex');
   const toSign = crypto.createHash('sha256').update(JSON.stringify(tx)).digest();
   const sig = Buffer.from(req.body.sig, 'hex');
+
+  console.log(`Attempting to verify ${tx.hash} and ${toSign.toString("hex")} with:`);
+  console.log(`\t ${sig.toString("hex")}`);
+  console.log(`\t ${publicKey.toString("hex")}`);
 
   eccrypto.verify(publicKey, toSign, sig).then(function() {
     wallets[walletByAddress[tx.from]] -= tx.amount;
