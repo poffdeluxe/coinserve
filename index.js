@@ -92,7 +92,7 @@ app.post('/tx/create', (req, res) => {
 
   var hash = crypto.randomBytes(20).toString('hex');
   const tx = { to, from, amount, hash };
-  const toSign = crypto.createHash('sha256').update(JSON.stringify(tx)).digest().toString('hex');
+  const toSign = crypto.createHash('sha256').update(hash).digest().toString('hex');
 
   console.log(`Value to sign for ${hash}: ${toSign}`);
 
@@ -105,8 +105,9 @@ app.post('/tx/sign', (req, res) => {
   // and signature of transaction (in hex format)
 
   const tx = req.body.tx;
+  const hash = tx.hash;
   const publicKey = Buffer.from(req.body.publicKey, 'hex');
-  const toSign = crypto.createHash('sha256').update(JSON.stringify(tx)).digest();
+  const toSign = crypto.createHash('sha256').update(hash).digest();
   const sig = Buffer.from(req.body.sig, 'hex');
 
   console.log(`Attempting to verify ${tx.hash} and ${toSign.toString("hex")} with:`);
