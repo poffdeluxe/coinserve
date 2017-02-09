@@ -8,6 +8,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
 
+const DEFAULT_HOOK_DELAY = 3000;
 const DEFAULT_SATOSHI = 1000;
 const DEFAULT_NUM_SEED_WALLETS = 5;
 
@@ -125,12 +126,14 @@ app.post('/tx/sign', (req, res) => {
 
     // Call the webhook if one is defined
     if(hookUrl) {
-      const child = cp.fork(__dirname + '/hook');
+      setTimeout(() => {
+        const child = cp.fork(__dirname + '/hook');
 
-      child.send({
-        tx,
-        hookUrl
-      });
+        child.send({
+          tx,
+          hookUrl
+        });
+      }, DEFAULT_HOOK_DELAY);
     }
   }).catch(function() {
     res.status(400).json({errors: ['Failed to verify signature']});
