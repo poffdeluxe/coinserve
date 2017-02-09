@@ -3,6 +3,8 @@ const fetch = require('node-fetch');
 
 process.on('message', function(m) {
   console.log("Message received!");
+  m.tx.confirmed = new Date();
+
   fetch(m.hookUrl, {
     method: 'post',
     headers: {
